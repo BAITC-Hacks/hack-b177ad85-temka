@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tariff Campaign Lab</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <main class="shell">
+    <header class="masthead">
+      <p class="eyebrow">LOCAL MOCK EVALUATION</p>
+      <h1>Tariff Campaign Lab</h1>
+      <p class="lede">Run the existing pilot-driven agent and inspect its campaign plan.</p>
+    </header>
+    <section class="control-panel" aria-labelledby="run-title">
+      <div>
+        <p class="eyebrow">EVALUATION CONTROL</p>
+        <h2 id="run-title">Choose a seed</h2>
+      </div>
+      <form id="evaluate-form">
+        <label for="seed">Seed</label>
+        <div class="form-row">
+          <input id="seed" name="seed" type="number" min="0" max="2147483647" value="42" required>
+          <button type="submit" id="run-button">Run evaluation</button>
+        </div>
+        <p id="form-message" class="form-message" role="status"></p>
+      </form>
+    </section>
+    <section id="result" class="results" hidden>
+      <div class="result-heading">
+        <div>
+          <p class="eyebrow">RESULT</p>
+          <h2>Seed <span id="result-seed"></span></h2>
+        </div>
+        <span id="environment" class="badge"></span>
+      </div>
+      <div id="metrics" class="metrics"></div>
+      <div class="campaigns-wrap">
+        <div class="section-heading"><h2>Final campaigns</h2><span id="campaign-count"></span></div>
+        <div id="campaigns" class="campaigns"></div>
+      </div>
+      <div id="warnings" class="warnings" hidden></div>
+    </section>
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

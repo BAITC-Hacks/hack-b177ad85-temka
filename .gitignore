@@ -2,6 +2,7 @@ __pycache__/
 *.py[cod]
 .tmpdeps/
 .venv/
+.venv-web/
 venv/
 .env
 .env.*
