@@ -15,25 +15,27 @@ class Agent:
 
     @staticmethod
     def _hypotheses():
-        """Public shortlist from candidate_analysis.md, table 'Кандидаты'.
+        """Asan's candidate_handoff.txt, commit 176723eebe50d36be7596f68201858c3e7fb9ca7.
 
         Bundle identifiers only so submitting agent.py needs no report file.
         No historical lift, conversion rate or mock effect is encoded here.
         These are experiments, not predetermined winning campaigns.
+        All eight priorities and four reserves get an initial pilot; reserves
+        are not conditionally activated in this shortlist-only comparison.
         """
         return [
-            ("tariff_14", "LOW", "tariff_9"),
-            ("tariff_3", "MID", "tariff_11"),
-            ("tariff_3", "MID", "tariff_10"),
-            ("tariff_3", "MID", "tariff_8"),
-            ("tariff_13", "MID", "tariff_10"),
-            ("tariff_12", "MID", "tariff_8"),
-            ("tariff_15", "MID", "tariff_10"),
-            ("tariff_4", "MID", "tariff_11"),
-            ("tariff_9", "MID", "tariff_8"),
             ("tariff_15", "MID", "tariff_8"),
-            ("tariff_13", "MID", "tariff_9"),
-            ("tariff_9", "MID", "tariff_4"),
+            ("tariff_4", "MID", "tariff_8"),
+            ("tariff_13", "MID", "tariff_8"),
+            ("tariff_3", "MID", "tariff_8"),
+            ("tariff_8", "MID", "tariff_10"),
+            ("tariff_15", "MID", "tariff_10"),
+            ("tariff_10", "MID", "tariff_8"),
+            ("tariff_12", "MID", "tariff_8"),
+            ("tariff_15", "MID", "tariff_4"),
+            ("tariff_15", "MID", "tariff_9"),
+            ("tariff_11", "HIGH", "tariff_12"),
+            ("tariff_13", "MID", "tariff_4"),
         ]
 
     @staticmethod
