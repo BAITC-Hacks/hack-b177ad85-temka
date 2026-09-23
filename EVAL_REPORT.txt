@@ -1,0 +1,61 @@
+QA evaluation report
+
+Tester: Султанали
+Date: 2026-09-23
+Checked agent commit: 4c3d89b55da3af3272ae285a01bc2360030c3bae
+Branch: codex/qa-release-report
+Python: 3.14.7
+Environment: local mock environment only
+
+Commands executed:
+- python --version
+- python local_eval.py
+- python local_eval.py --runs 10
+
+SINGLE RUN (seed 42):
+- Exit code: 0
+- Status: PASS
+- Net result: +2,083,490
+- Total campaigns in report: 22 (20 pilots + 2 final campaigns)
+- Pilots: 20/20
+- Final campaigns: 2
+- Contacts: 5,067
+- Spend: 73,314 / 100,000
+- Final campaign contacts: 1,227 and 1,720; maximum 1,720 / 5,000
+- Dropped campaigns: none reported
+- Agent or pilot errors: none reported
+
+10 RUNS:
+- Exit code: 0
+- Median: +2,708,803
+- Minimum: +1,533,593
+- Maximum: +3,252,821
+- Positive runs: 10/10
+- The --runs output reports net results only; single-run contacts, spend,
+	pilot count, and campaign sizes are not spread across this series.
+- Per-run resource limits: not confirmed by this report because the series
+	output does not print those resource metrics for every seed.
+
+LIMIT CHECKS:
+- Pilots: 20 / 20 maximum in the single run; within the limit.
+- Total contacts: 5,067 / 15,000 in the single run; within the limit.
+- Total spend: 73,314 / 100,000 in the single run; within the limit.
+- Final campaigns: 2 / 10 in the single run; within the limit.
+- Contacts per final campaign: maximum 1,720 / 5,000; within the limit.
+- Dropped campaigns due to invalid tariff or channel: none reported.
+- Agent and pilot errors: none reported.
+
+Limit status for the single run: no violations observed.
+Limit status for every one of the 10 runs: not confirmed by the available
+series output; no resource-level error was printed.
+
+CHECKING LIMITATIONS:
+- The checks were performed on the mock environment. Its effects are
+	synthetic and do not guarantee profitability on the hidden judging
+	environment.
+- make_submission.py was intentionally not run, so submission.csv generation
+	and reproducibility were not checked in this task.
+- No code, data, or project algorithm was changed during evaluation.
+
+VERDICT: PASS for the observed mock evaluation; release submission checks
+remain pending where explicitly marked above.
