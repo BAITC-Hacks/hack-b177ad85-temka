@@ -56,6 +56,12 @@ git push -u origin codex/<короткая-задача>
 
 ## Контекст для Codex
 
+Готовые инструкции для каждого участника:
+
+- `TASK_NAURYZBAY.txt` — интеграция и `agent.py`;
+- `TASK_ASAN.txt` — проверка shortlist кандидатов;
+- `TASK_SULTANALI.txt` — независимые прогоны и submission.
+
 В начале каждого нового запроса к Codex используйте шаблон:
 
 ```text
