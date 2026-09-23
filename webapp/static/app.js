@@ -9,10 +9,10 @@
   const integerFormat = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 });
   const signedFormat = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2, signDisplay: "exceptZero" });
   const FILTER_LABELS = new Map([
-    ["filter_current_tariff", "Текущий тариф"],
-    ["filter_arpu_segment", "ARPU"],
-    ["filter_data_segment", "Данные"],
-    ["filter_call_segment", "Звонки"],
+    ["current_tariff", "Текущий тариф"],
+    ["arpu_segment", "ARPU"],
+    ["data_segment", "Данные"],
+    ["call_segment", "Звонки"],
   ]);
   const CHANNEL_LABELS = new Map([
     ["push", "Push"], ["sms", "SMS"], ["digital_ads", "Реклама"], ["call", "Звонок"],
@@ -58,6 +58,7 @@
           !isCount(campaign.n_customers) || !isObject(campaign.filters)) {
         throw formatError();
       }
+      // HTTP API keys have no filter_ prefix (backend contract 430556f).
       // Only the four public campaign filters belong on screen, never client IDs.
       // Values remain as returned (including null, strings or JSON arrays).
       if (Object.keys(campaign.filters).some((key) => !FILTER_LABELS.has(key))) {

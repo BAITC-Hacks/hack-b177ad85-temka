@@ -1,7 +1,7 @@
 # Handoff Асана: локальный интерфейс
 
 База: `4c3d89b55da3af3272ae285a01bc2360030c3bae`. Ветка: `codex/web-frontend`.
-Общий договор взят из переданного командой текста от 23.09.2026; backend и официальный `docs/WEB_CONTRACT.md` готовит Наурызбай.
+Общий договор взят из переданного командой текста от 23.09.2026 и уточнён по `docs/WEB_CONTRACT.md` ветки `codex/web-backend`, коммит `430556f65d7ab35190e29ed9429ba75d703ed76b`. В HTTP-ответе ключи `campaigns[].filters` идут без префикса `filter_`.
 
 ## Сделано
 
@@ -23,7 +23,7 @@
 
 Seed проверяется до запроса: целое число 0–2147483647, без знака, дроби и экспоненты. В JSON передаётся число, не строка. Граничные значения допустимы; окружающие пробелы ввода удаляются.
 
-Ответ 200: `seed`, `environment: "mock"`, `metrics` (`net_gain`, `total_cost`, `total_contacts`, `pilot_count`, `final_campaign_count`), `campaigns`, `warnings`, `duration_seconds`. Числа конечные, счётчики целые неотрицательные; число кампаний должно совпадать с длиной массива. Net gain может быть отрицательным. У кампании нужны `target_tariff`, `channel`, `n_customers`, объект `filters`. Поддержаны `filter_current_tariff`, `filter_arpu_segment`, `filter_data_segment`, `filter_call_segment`; неожиданные ключи фильтров не отображаются и вызывают ошибку формата. Значения разрешённых фильтров выводятся как текст, пустое/null — «без ограничения».
+Ответ 200: `seed`, `environment: "mock"`, `metrics` (`net_gain`, `total_cost`, `total_contacts`, `pilot_count`, `final_campaign_count`), `campaigns`, `warnings`, `duration_seconds`. Числа конечные, счётчики целые неотрицательные; число кампаний должно совпадать с длиной массива. Net gain может быть отрицательным. У кампании нужны `target_tariff`, `channel`, `n_customers`, объект `filters`. Поддержаны ровно четыре ключа: `current_tariff`, `arpu_segment`, `data_segment`, `call_segment` — без `filter_`. Неизвестные ключи, включая старые имена с префиксом, `customer_id` и `explicit_ids`, вызывают ошибку формата и не отображаются. По контракту backend значения фильтров — строки; интерфейс выводит значения безопасным текстом, пустое/null — «без ограничения».
 
 Ошибки по договору: `{ "error": { "code": "…", "message": "…" } }`. Соответствия: 400/INVALID_INPUT, 409/EVALUATION_BUSY, 500/EVALUATION_FAILED. Сообщение сервера выводится безопасным текстом. При HTML вместо JSON ошибки 400/409/500 сохраняют смысл HTTP-статуса и отмечают нарушение формата.
 
@@ -31,7 +31,11 @@ Seed проверяется до запроса: целое число 0–21474
 
 ## Проверки и честная готовность
 
-Выполнен браузерный стенд ниже: **56/56 проверок прошли**, Chrome `154.0.8037.57`, Python `3.14.3`, Windows PowerShell `5.1.26100.9444`, код завершения 0. Стенд использует только статический HTTP-сервер и явно тестовые ответы, внедрённые в отдельную вкладку Chrome через DevTools. Это **не настоящий API и не end-to-end оценка агента**. Стенд не входит в загружаемые приложением файлы.
+### Исправление совместимости после 930bd8c
+
+В `930bd8c` была подтверждённая ошибка: `FILTER_LABELS` и разрешённые поля ожидали `filter_*`, а backend `430556f` возвращает имена без этого префикса. Исправлены четыре ключа в рабочем JS, положительных/отрицательных тестовых фикстурах и описании API. Проверка неизвестных ключей не отключалась. Добавлены регрессии для всех четырёх допустимых фильтров, примера `tariff_4/MID → tariff_8` через `digital_ads` на 1227 клиентов и отклонения старых ключей, произвольного неизвестного поля и клиентских ID. Повторный браузерный прогон описан ниже; это проверки на фикстурах, не на настоящем Flask-сервере.
+
+После исправления повторно выполнен браузерный стенд ниже: **64/64 проверки прошли** (прежде было 56), Chrome `154.0.8037.57`, Python `3.14.3`, Windows PowerShell `5.1.26100.9444`, код завершения 0. Стенд использует только статический HTTP-сервер и явно тестовые ответы, внедрённые в отдельную вкладку Chrome через DevTools. Это **не настоящий API и не end-to-end оценка агента**. Стенд не входит в загружаемые приложением файлы.
 
 Автоматически проверены: пустой экран и загрузка локальных ресурсов; порядок Tab (skip-link → бренд → seed → кнопка); блокировка двойного submit; точный POST с числовым seed; положительный и отрицательный результат; девять вариантов неверного ввода и обе границы seed; длинные фильтры/предупреждения и HTML-подобный текст без выполнения; очистка результатов при повторе; 400, 409, 500, разрыв соединения, HTML-ошибка 500, отсутствие маршрута, неожиданный статус; нарушения схемы, типов, seed и счётчика кампаний; отбрасывание клиентского ID; неверный JSON/Content-Type; ноль, пустой план, превышения лимитов; таймаут и успешное восстановление после ошибок. Таймаут ускорен только в тестовой вкладке; ожидание в 11 минут в реальном времени не проверялось.
 
@@ -39,9 +43,9 @@ Seed проверяется до запроса: целое число 0–21474
 
 **Визуальная проверка:** просмотрены скриншоты успешного десктопного состояния и мобильного отрицательного результата с длинными фильтрами/предупреждениями. Карточки, подписи, знак минус, предупреждения и локальная прокрутка таблицы отображаются корректно. Полная ручная проверка screen reader, мобильного touch, масштабирования 200% и других браузеров не выполнена. Скриншоты начального десктопного и узкого 320 px состояний тоже созданы; их геометрия проверена автоматически.
 
-Артефакты локального прогона: `%TEMP%\beeline-frontend-check-p09cz5h8\` — `01-empty-desktop.png`, `02-success-desktop.png`, `03-negative-mobile.png`, `04-narrow-320.png`. Они не включены в Git. Значения на этих изображениях — **тестовые фикстуры**, не показатели агента.
+Артефакты повторного локального прогона после исправления: `%TEMP%\beeline-frontend-check-6jnliswd\` — `01-empty-desktop.png`, `02-success-desktop.png`, `03-negative-mobile.png`, `04-narrow-320.png`. Новые десктопный и мобильный скриншоты просмотрены визуально. Они не включены в Git. Значения на этих изображениях — **тестовые фикстуры**, не показатели агента.
 
-Команда браузерной проверки приведена ниже; используется UTF-8 stdin, чтобы Windows PowerShell не исказил кавычки многострочного сценария. Первая попытка передачи сценария через `python -c` дала ошибку синтаксиса из-за экранирования и была исправлена в команде запуска; рабочий интерфейс не требовал изменений для прохождения стенда. Дополнительно выполнены `git diff --check` и `git diff --cached --check` без ошибок; просмотрен staged diff. В коммит включены ровно четыре согласованных файла: этот handoff, `index.html`, `app.js`, `styles.css`.
+Команда браузерной проверки приведена ниже; используется UTF-8 stdin, чтобы Windows PowerShell не исказил кавычки многострочного сценария. Дополнительно выполнены `git diff --check` и `git diff --cached --check` без ошибок; просмотрен staged diff. Исходный frontend-коммит содержит четыре согласованных файла. Исправление несовпадения фильтров затрагивает только `webapp/static/app.js` и этот handoff со встроенными фикстурами и тестами; backend и `main` не меняются.
 
 Реальные прогоны `local_eval.py`, `make_submission.py` и агента не запускались. Настоящий Flask API на этой ветке отсутствует: его интеграция, расчёты и воспроизводимость остаются непроверенными. **Готов frontend по договору, а не полностью объединённое приложение.**
 
@@ -232,10 +236,10 @@ def run_case(config, seed='42'):
 
 fixture = {
     'seed': 42, 'environment': 'mock',
-    'metrics': {'net_gain': 1234.5, 'total_cost': 128, 'total_contacts': 120,
+    'metrics': {'net_gain': 1234.5, 'total_cost': 27314, 'total_contacts': 1307,
                 'pilot_count': 2, 'final_campaign_count': 1},
-    'campaigns': [{'target_tariff': 'tariff_8', 'channel': 'sms', 'n_customers': 80,
-                   'filters': {'filter_current_tariff': 'tariff_4', 'filter_arpu_segment': 'MID'}}],
+    'campaigns': [{'target_tariff': 'tariff_8', 'channel': 'digital_ads', 'n_customers': 1227,
+                   'filters': {'current_tariff': 'tariff_4', 'arpu_segment': 'MID'}}],
     'warnings': [], 'duration_seconds': 0.12,
 }
 
@@ -290,7 +294,12 @@ try:
     wait_idle()
     check('POST contract', 'testRequests[0].url === "/api/evaluate" && testRequests[0].method === "POST" && testRequests[0].body.seed === 42 && Object.keys(testRequests[0].body).length === 1 && testRequests[0].headers["Content-Type"] === "application/json"')
     check('positive result', 'document.getElementById("net-gain").textContent === "+1 234,5" && document.getElementById("campaign-rows").children.length === 1')
+    check('backend campaign example', 'document.querySelector("#campaign-rows .filter-list").textContent.includes("Текущий тариф: tariff_4") && document.querySelector("#campaign-rows .filter-list").textContent.includes("ARPU: MID") && document.querySelector("#campaign-rows .channel-label").textContent === "Реклама" && document.querySelector("#campaign-rows .number-cell").textContent === "1 227" && document.querySelector("#campaign-rows tr").children[2].textContent === "tariff_8"')
     snapshot('02-success-desktop', 1440, 1200)
+    sample = json.loads(json.dumps(fixture))
+    sample['campaigns'][0]['filters'].update(data_segment='HEAVY', call_segment='HIGH')
+    run_case({'data': sample})
+    check('all four unprefixed filters', 'document.getElementById("error-panel").hidden && document.querySelectorAll("#campaign-rows .filter-list li").length === 4 && document.getElementById("campaign-rows").textContent.includes("Данные: HEAVY") && document.getElementById("campaign-rows").textContent.includes("Звонки: HIGH")')
     for seed in ['', '-1', '+42', '1.5', '1e3', 'true', 'null', '2147483648', '999999999999999999999']:
         before = cdp.js('testRequests.length')
         run_case({'data': fixture}, seed)
@@ -303,7 +312,7 @@ try:
     negative['metrics']['net_gain'] = -1234.5
     attack = '<img src=x onerror="window.injected=true">'
     negative['warnings'] = [attack + ' Длинное предупреждение. ' * 30]
-    negative['campaigns'][0]['filters']['filter_current_tariff'] = 'tariff_4;' * 40 + attack
+    negative['campaigns'][0]['filters']['current_tariff'] = 'tariff_4;' * 40 + attack
     run_case({'data': negative})
     check('negative result', 'document.getElementById("net-gain").textContent === "-1 234,5" && document.getElementById("gain-description").textContent === "Отрицательный результат"')
     check('text-only rendering', '!window.injected && document.querySelectorAll("img").length === 0 && document.getElementById("warnings-list").textContent.includes("<img") && document.getElementById("campaign-rows").textContent.includes("<img")')
@@ -332,9 +341,11 @@ try:
         sample = json.loads(json.dumps(fixture)); sample['metrics'][field] = value
         run_case({'data': sample})
         check('bad metric ' + field + str(value), 'document.getElementById("error-title").textContent === "Неожиданный формат ответа"')
-    sample = json.loads(json.dumps(fixture)); sample['campaigns'][0]['filters'] = {'customer_id': 'private-fixture-id'}
-    run_case({'data': sample})
-    check('client identifier not rendered', 'document.getElementById("error-title").textContent === "Неожиданный формат ответа" && !document.body.textContent.includes("private-fixture-id")')
+    for unknown_key in ['filter_current_tariff', 'filter_arpu_segment', 'filter_data_segment', 'filter_call_segment', 'customer_id', 'explicit_ids', 'unexpected_filter']:
+        sample = json.loads(json.dumps(fixture))
+        sample['campaigns'][0]['filters'][unknown_key] = 'private-fixture-id'
+        run_case({'data': sample})
+        check('unknown filter rejected: ' + unknown_key, 'document.getElementById("error-title").textContent === "Неожиданный формат ответа" && !document.body.textContent.includes("private-fixture-id") && document.getElementById("campaign-rows").children.length === 0 && document.getElementById("net-gain").textContent === "—"')
     run_case({'raw': '{invalid json'})
     check('invalid JSON', 'document.getElementById("error-title").textContent === "Неожиданный формат ответа"')
     run_case({'data': fixture, 'contentType': 'text/plain'})
