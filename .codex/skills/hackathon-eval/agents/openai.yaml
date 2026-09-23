@@ -1,0 +1,7 @@
+interface:
+  display_name: "Hackathon Eval"
+  short_description: "Validate agent runs and prepare submission"
+  default_prompt: "Use $hackathon-eval to run the agent checks and summarize the result."
+
+policy:
+  allow_implicit_invocation: true

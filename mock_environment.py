@@ -20,6 +20,8 @@ data/change_tariff.csv простым усреднением. Это НЕ та �
 import numpy as np
 import pandas as pd
 
+a = 500
+
 from environment import make_environment
 
 CHANNELS = {
