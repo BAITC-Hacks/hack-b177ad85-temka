@@ -11,13 +11,24 @@
 - Added unittest coverage for the API contract, invalid inputs, concurrency,
   failure recovery, and a real seed-42 evaluation.
 
+## Backend handoff status
+
+- Backend branch received: `codex/web-backend`.
+- Backend commit: `430556f65d7ab35190e29ed9429ba75d703ed76b`.
+- Backend contract and handoff were reviewed from that branch.
+- The backend requires `webapp.service.evaluate(seed)` and campaign objects with
+  `target_tariff`, `channel`, `n_customers`, and unprefixed `filters`.
+- This branch's independent API wrapper predates that backend integration; the
+  service contract has not been end-to-end merged or revalidated here.
+
 ## Checks run
 
 - `python -m py_compile webapp/app.py`: passed.
 - `python --version`: Python 3.14.7.
 - `python -m unittest discover -s tests -v`: run after web dependencies are
   installed in `.venv-web`.
-- Manual server/API smoke check: run after environment setup.
+- Manual server/API smoke check: passed for this branch's local wrapper; the
+  backend/frontend integrated smoke check remains pending.
 
 The real evaluator uses the existing mock environment and scoring code. No
 agent strategy, scoring mechanics, data, or submission artifact was changed.
@@ -29,6 +40,7 @@ agent strategy, scoring mechanics, data, or submission artifact was changed.
 - `submission.csv` was not changed and `make_submission.py` was not run.
 - Resource metrics for every seed in `--runs 10` are not exposed by the existing
   CLI, so the web endpoint reports metrics for the selected seed only.
+- The frontend has not been browser-tested against the backend branch yet.
 - PowerShell port diagnostics depend on `Get-NetTCPConnection`, available in
   the supported Windows PowerShell environment.
 

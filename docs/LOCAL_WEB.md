@@ -8,7 +8,7 @@ judging score.
 
 - Python: 3.14.7
 - PowerShell: 5.1 (Windows PowerShell)
-- Flask: 3.1.2 in `.venv-web`
+- Flask: 3.1.3 in `.venv-web`
 - Address: http://127.0.0.1:8000
 
 ## First-time setup
