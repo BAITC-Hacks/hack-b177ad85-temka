@@ -104,3 +104,85 @@ The API tests were aligned with the shared contract from backend commit
   additional fields from the handoff.
 - Before release: create and verify `submission.csv` through the official
   command, then run both local evaluation commands again.
+
+## Independent final verification
+
+Date: 2026-09-23. Worktree: `codex/web-qa-final`.
+Checked integration SHA: `8530a5a615460af146b393fcdd235d553bdbdac4`.
+The worktree was created from that SHA and was not mixed with another branch.
+
+Environment:
+
+- Windows PowerShell 5.1; Python 3.14.7.
+- Flask 3.1.3, Werkzeug 3.1.8, NumPy 2.5.3, pandas 3.0.6.
+- A new `.venv-web` was created by `start_web.ps1`; it was not copied from
+  another worktree. Package installation used cached wheels in this environment.
+- The first direct PowerShell invocation was blocked by the local
+  ExecutionPolicy. The documented `powershell.exe -NoProfile
+  -ExecutionPolicy Bypass -File ...` invocation succeeded without changing
+  persistent policy or requiring administrator access.
+
+Installation and launcher checks:
+
+- First launcher run from `Web QA Final Path` with spaces: PASS. It created
+  `.venv-web`, installed `requirements-web.txt`, used its Python, and started
+  `http://127.0.0.1:8000`.
+- Repeat launcher run: PASS without reinstalling dependencies.
+- `start_web.ps1 -Reinstall`: PASS; pip reported the required packages and the
+  server started again.
+- A second launcher while the first server was running: PASS as a refusal;
+  exit code 1 with `Port 8000 is already in use`. The first server remained
+  healthy with HTTP 200.
+- Ctrl+C was sent to the own launcher terminal; the server stopped and port
+  8000 had no listener afterward. No other process was stopped.
+
+Required commands and exit status:
+
+- `.venv-web\Scripts\python.exe -m pip check`: exit 0, `No broken
+  requirements found`.
+- `.venv-web\Scripts\python.exe -X utf8 -m unittest discover -s tests -v`:
+  exit 0, **29 tests, OK**. The expected RuntimeError is logged by the
+  controlled failure test; it is not a test failure.
+- `.venv-web\Scripts\python.exe -X utf8 local_eval.py`: exit 0, PASS.
+- `.venv-web\Scripts\python.exe -X utf8 local_eval.py --runs 10`: exit 0,
+  PASS.
+
+Live HTTP checks (not browser end-to-end):
+
+- `GET /`: 200, `text/html`, frontend element `evaluation-form` present.
+- `GET /api/health`: 200, `{"status":"ok"}`.
+- `GET /static/app.js`: 200.
+- `GET /static/styles.css`: 200.
+- `POST /api/evaluate` with `{"seed":42}`: 200; net `2,083,490.0099088582`,
+  cost `73,314`, contacts `5,067`, pilots `20`, final campaigns `2`, and
+  empty warnings. These metrics match the same-environment CLI result.
+- This was HTTP and Flask/PowerShell verification, not a browser test. Browser
+  rendering and console checks belong to Asan's frontend verification.
+
+Agent stability, seeds 0-9:
+
+| Seed | Net result | Pilots | Total contacts | Total cost | Final campaigns | Largest campaign |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | 3,252,821 | 20 | 6,331 | 96,766 | 4 | 1,720 |
+| 1 | 2,521,677 | 20 | 4,269 | 57,558 | 2 | 1,227 |
+| 2 | 3,022,479 | 20 | 7,622 | 64,438 | 4 | 1,720 |
+| 3 | 3,054,778 | 20 | 5,989 | 95,398 | 3 | 1,720 |
+| 4 | 2,833,720 | 20 | 4,621 | 65,122 | 3 | 1,227 |
+| 5 | 2,583,887 | 20 | 4,366 | 57,946 | 2 | 1,227 |
+| 6 | 2,254,787 | 20 | 5,104 | 75,928 | 3 | 1,720 |
+| 7 | 2,187,424 | 20 | 4,369 | 35,474 | 2 | 1,227 |
+| 8 | 1,533,593 | 20 | 3,147 | 34,674 | 1 | 1,227 |
+| 9 | 3,236,890 | 20 | 6,231 | 96,366 | 4 | 1,720 |
+
+Summary: median `2,708,803`, minimum `1,533,593`, maximum `3,252,821`,
+positive `10/10`, zero `0/10`, negative `0/10`. Contacts ranged from
+`3,147` to `7,622`; cost ranged from `34,674` to `96,766`; final campaigns
+ranged from `1` to `4`; largest campaign was `1,720`. No campaign was reported
+as dropped or capped in the public result details, no warnings/errors occurred,
+and no resource limit was exceeded. The evaluation used public
+`evaluate_agent`; no hidden environment internals were read.
+
+Still not checked in this final worktree: browser automation, other operating
+systems/Python versions, hidden judging, `make_submission.py`, official
+submission, and changes to `main`. Mock profitability is not a guarantee of
+the hidden score.
