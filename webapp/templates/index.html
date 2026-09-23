@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Локальная демонстрация агента тарифных маркетинговых кампаний на синтетических данных.">
+  <title>Тарифная лаборатория · Beeline</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#evaluation-form">Перейти к запуску оценки</a>
+  <div class="page-shell">
+    <header class="masthead">
+      <a class="brand" href="/" aria-label="Тарифная лаборатория — главная">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span>Тарифная лаборатория<span class="brand-caption">BEELINE · HACKATHON</span></span>
+      </a>
+      <span class="local-label">Локальное приложение</span>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div>
+          <span class="mock-badge"><span aria-hidden="true"></span>Демонстрация на mock-среде</span>
+          <h1 id="page-title">От гипотезы<br>к выгодной кампании<span class="accent-dot">.</span></h1>
+          <p class="intro-copy">Агент проверяет предложения пилотами и выбирает, кому предложить новый тариф и через какой канал — с учётом расходов и ограничений.</p>
+        </div>
+        <aside class="method-note" aria-label="Как принимается решение">
+          <p class="eyebrow">КАК ЭТО РАБОТАЕТ</p>
+          <ol class="method-steps">
+            <li><span>01</span>Проверить гипотезы</li>
+            <li><span>02</span>Уточнить эффект пилотами</li>
+            <li><span>03</span>Выбрать кампании</li>
+          </ol>
+          <p>Одна оценка. Новая среда.<br>Решения по результатам экспериментов.</p>
+        </aside>
+      </section>
+
+      <section class="run-panel" aria-labelledby="run-title">
+        <div class="run-description">
+          <p class="eyebrow">ВАШ ЭКСПЕРИМЕНТ</p>
+          <h2 id="run-title">Запустите оценку</h2>
+          <p>Одинаковый seed позволяет повторить эксперимент.</p>
+        </div>
+        <form id="evaluation-form" novalidate>
+          <div class="seed-field">
+            <label for="seed">Seed <span>· начальное значение</span></label>
+            <input id="seed" name="seed" type="text" inputmode="numeric" value="42" required
+              autocomplete="off" spellcheck="false" aria-describedby="seed-hint seed-error">
+            <p id="seed-hint" class="field-hint">Целое число от 0 до 2 147 483 647</p>
+            <p id="seed-error" class="field-error" hidden></p>
+          </div>
+          <button id="run-button" type="submit" disabled><span id="button-label">Запустить оценку</span><span class="button-arrow" aria-hidden="true">↗</span></button>
+        </form>
+      </section>
+
+      <noscript><p class="error-panel">Для запуска оценки нужен JavaScript. Включите его в браузере и обновите страницу.</p></noscript>
+      <div id="status" class="status-line" role="status" aria-live="polite" aria-atomic="true">
+        <span id="status-indicator" class="status-indicator" aria-hidden="true"></span>
+        <span id="status-text">Готово к запуску. Результатов пока нет.</span>
+      </div>
+      <div id="error-panel" class="error-panel" role="alert" tabindex="-1" hidden>
+        <h2 id="error-title"></h2>
+        <p id="error-message"></p>
+      </div>
+
+      <section id="results" class="results" aria-labelledby="results-title" aria-busy="false">
+        <div class="section-heading">
+          <h2 id="results-title" tabindex="-1">Результат оценки</h2>
+          <p id="result-context" class="result-context">Показатели появятся после запуска</p>
+        </div>
+        <div class="metrics-grid">
+          <article class="metric metric-primary" aria-labelledby="net-label">
+            <h3 id="net-label">Итоговый net gain</h3>
+            <p id="net-gain" class="metric-value">—</p>
+            <p class="metric-unit">у.е. · чистый результат</p>
+            <p id="gain-description" class="gain-description">Ожидает запуска</p>
+          </article>
+          <article class="metric" aria-labelledby="cost-label">
+            <h3 id="cost-label">Расходы</h3>
+            <p id="total-cost" class="metric-value">—</p>
+            <p class="metric-unit">из 100 000 у.е.</p>
+            <p class="metric-foot">Пилоты + финал</p>
+          </article>
+          <article class="metric" aria-labelledby="contacts-label">
+            <h3 id="contacts-label">Контакты</h3>
+            <p id="total-contacts" class="metric-value">—</p>
+            <p class="metric-unit">из 15 000</p>
+            <p class="metric-foot">Включая повторные</p>
+          </article>
+          <article class="metric" aria-labelledby="pilots-label">
+            <h3 id="pilots-label">Пилоты</h3>
+            <p id="pilot-count" class="metric-value">—</p>
+            <p class="metric-unit">из 20</p>
+            <p class="metric-foot">Проверка гипотез</p>
+          </article>
+          <article class="metric" aria-labelledby="campaign-count-label">
+            <h3 id="campaign-count-label">Кампании</h3>
+            <p id="campaign-count" class="metric-value">—</p>
+            <p class="metric-unit">из 10 · минимум 1</p>
+            <p class="metric-foot">Финальный план</p>
+          </article>
+        </div>
+        <p class="metrics-explainer">Net gain — прирост выручки по уникальным клиентам минус расходы на коммуникации. Расходы и контакты включают пилоты и финальные кампании; контакты не равны числу уникальных клиентов.</p>
+
+        <section class="campaign-panel" aria-labelledby="campaigns-title">
+          <div class="section-heading campaign-heading">
+            <div><p class="eyebrow">ПЛАН АГЕНТА</p><h2 id="campaigns-title">Финальные кампании</h2></div>
+            <span class="limit-chip">До 5 000 клиентов в каждой</span>
+          </div>
+          <div id="campaign-empty" class="empty-state">
+            <span class="empty-icon" aria-hidden="true">↗</span>
+            <h3 id="empty-title">Сначала — эксперимент</h3>
+            <p id="empty-description">Запустите оценку, чтобы увидеть выбранные сегменты, тарифы и каналы.</p>
+          </div>
+          <div id="campaign-table-wrap" class="table-scroll" role="region" aria-label="Таблица финальных кампаний — доступна горизонтальная прокрутка" tabindex="0" hidden>
+            <table>
+              <caption class="visually-hidden">Только финальные кампании; пилоты в таблицу не входят.</caption>
+              <thead><tr><th scope="col">№</th><th scope="col">Исходные фильтры</th><th scope="col">Целевой тариф</th><th scope="col">Канал</th><th scope="col" class="number-cell">Клиентов</th></tr></thead>
+              <tbody id="campaign-rows"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="warnings-panel" class="warnings-panel" aria-labelledby="warnings-title" hidden>
+          <h2 id="warnings-title">Предупреждения</h2>
+          <p id="warnings-empty" hidden>Сервер не передал предупреждений.</p>
+          <ul id="warnings-list"></ul>
+        </section>
+      </section>
+      <aside class="disclaimer">
+        <span class="disclaimer-icon" aria-hidden="true">i</span>
+        <p><strong>Эксперимент, не прогноз.</strong> Синтетические данные, условные единицы и mock-эффекты. Результат не является реальной прибылью Beeline и не гарантирует результат на скрытой проверке. Этот сайт не заменяет официальную сдачу.</p>
+      </aside>
+    </main>
+    <footer><span>Тарифная лаборатория</span><span>Локальная демонстрация · без runtime-LLM</span></footer>
+  </div>
+</body>
+</html>
