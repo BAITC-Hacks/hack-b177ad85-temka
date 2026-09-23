@@ -54,14 +54,15 @@
       throw formatError();
     }
     for (const campaign of data.campaigns) {
-      if (!isObject(campaign) || !isText(campaign.target_tariff) || !isText(campaign.channel) ||
+      if (!isObject(campaign) || !isText(campaign.target_tariff) || !CHANNEL_LABELS.has(campaign.channel) ||
           !isCount(campaign.n_customers) || !isObject(campaign.filters)) {
         throw formatError();
       }
       // HTTP API keys have no filter_ prefix (backend contract 430556f).
       // Only the four public campaign filters belong on screen, never client IDs.
-      // Values remain as returned (including null, strings or JSON arrays).
-      if (Object.keys(campaign.filters).some((key) => !FILTER_LABELS.has(key))) {
+      // The contract permits strings only; nested objects could expose client IDs.
+      if (Object.entries(campaign.filters).some(([key, value]) =>
+          !FILTER_LABELS.has(key) || typeof value !== "string")) {
         throw formatError();
       }
     }
@@ -116,8 +117,7 @@
         list.className = "filter-list";
         for (const [name, value] of entries) {
           const item = document.createElement("li");
-          const displayValue = value === null || value === "" ? "без ограничения" :
-            (typeof value === "string" ? value : JSON.stringify(value));
+          const displayValue = value === "" ? "без ограничения" : value;
           item.textContent = `${FILTER_LABELS.get(name)}: ${displayValue}`;
           list.append(item);
         }
